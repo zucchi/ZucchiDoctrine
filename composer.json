@@ -16,11 +16,12 @@
     }],
     "license": "BSD-3-Clause",
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.4.1",
         "zendframework/zendframework": "dev-master",
-        "zucchi/admin": "dev-master",
+        "zucchi/zucchi": "dev-master",
         "doctrine/doctrine-module": "dev-master",
-        "doctrine/doctrine-orm-module": "dev-master"
+        "doctrine/doctrine-orm-module": "dev-master",
+        "gedmo/doctrine-extensions": "dev-master",
     },
     "autoload": {
         "psr-0": {
