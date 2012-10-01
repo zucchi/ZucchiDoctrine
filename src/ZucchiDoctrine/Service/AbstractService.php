@@ -8,14 +8,14 @@
  */
 namespace ZucchiDoctrine\Service;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
-
-use ZucchiDoctrine\Entity\AbstractEntity;
-
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\EventManager\EventManagerAwareInterface;
-use Zucchi\Event\ProviderTrait as EventProvider;
+
+use ZucchiDoctrine\Entity\AbstractEntity;
+use Zucchi\Event\EventProviderTrait as EventProvider;
 use Zucchi\Debug\Debug;
+
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\Common\Collections\Criteria;

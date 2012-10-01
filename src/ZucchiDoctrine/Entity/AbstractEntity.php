@@ -18,14 +18,32 @@ namespace ZucchiDoctrine\Entity;
 class AbstractEntity implements
     \JsonSerializable
 {
+    
     /**
-     * return object as and array
+     * return public and protected properties as an array
      * 
+     * @param boolean $deep include nested objects and colleactions
+     * @param boolean $all include private 
      * @return array
      */
-    public function toArray()
+    public function toArray($deep = true, $all = false)
     {
-        return get_object_vars($this);
+        $getpublic = function($obj) { return get_object_vars($obj); };
+        
+        $data = ($all) 
+              ? get_object_vars($this)
+              : $getpublic($this);
+        
+        foreach ($data AS $key => $val) {
+            if (is_object($val)) {
+                if ($deep && method_exists($val, 'toArray')) {
+                    $data[$key] = $val->toArray($deep, $all);
+                } else if (!$deep) {
+                    unset($data[$key]);
+                }
+            } 
+        }
+        return $data;
     }
     
     /**
@@ -35,5 +53,19 @@ class AbstractEntity implements
     public function jsonSerialize()
     {
         return $this->toArray();
+    }
+    
+    public function toString()
+    {
+        return $this->__toString();
+    }
+    
+    /**
+     * get a string representation of an entity
+     * @return string
+     */
+    public function __toString()
+    {
+        return get_class($this);
     }
 }

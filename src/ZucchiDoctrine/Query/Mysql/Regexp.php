@@ -10,6 +10,7 @@ namespace ZucchiDoctrine\Query\Mysql;
 
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;
 use Doctrine\ORM\Query\Lexer;
+use Zucchi\Debug\Debug;
 
 /**
  * Custom DQL String function to allow REGEXP functionality in MySQL Queries
