@@ -6,6 +6,19 @@ return array(
                 'stringFunctions' => array(
                     'REGEXP' => 'ZucchiDoctrine\Query\Mysql\Regexp',
                 ),
+                'types' => array(
+                    'datetime' => 'ZucchiDoctrine\Datatype\DateTimeType',
+                    'date' => 'ZucchiDoctrine\Datatype\DateType',
+                    'time' => 'ZucchiDoctrine\Datatype\TimeType',
+                    'money' => 'ZucchiDoctrine\Datatype\MoneyType',
+                ),
+            ),
+        ),
+        'connection' => array(
+            'orm_default' => array(
+                'doctrine_type_mappings' => array(
+                    'money' => 'money',
+                ),
             ),
         ),
         'eventmanager' => array(
@@ -20,6 +33,11 @@ return array(
                     'Gedmo\Uploadable\UploadableListener',
                 ),
             ),
+        ),
+    ),
+    'service_manager' => array(
+        'invokables' => array(
+            'zucchidoctrine.listener' => 'ZucchiDoctrine\Event\DoctrineListener',
         ),
     ),
     'view_helpers' => array(

@@ -68,4 +68,28 @@ class AbstractEntity implements
     {
         return get_class($this);
     }
+
+    /**
+     * @param  array|Traversable $options
+     * @throws Exception\InvalidArgumentException
+     * @return void
+     */
+    public function fromArray($options)
+    {
+        if (!is_array($options) && !$options instanceof Traversable) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Parameter provided to %s must be an array or Traversable',
+                __METHOD__
+            ));
+        }
+
+        foreach ($options as $key => $value) {
+            $method = 'set' . ucfirst($key);
+            if (method_exists($this, $method)) {
+                $this->{$method}($value);
+            } else if (property_exists($this, $key)) {
+                $this->{$key} = $value;
+            }
+        }
+    }
 }

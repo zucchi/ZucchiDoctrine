@@ -12,6 +12,7 @@ use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\EventManager\EventManagerAwareInterface;
 
 use ZucchiDoctrine\Entity\AbstractEntity;
+use ZucchiDoctrine\EntityManager\EntityManagerAwareTrait;
 use Zucchi\Event\EventProviderTrait as EventProvider;
 use Zucchi\Debug\Debug;
 
@@ -30,6 +31,7 @@ use Doctrine\Common\Collections\Criteria;
 class AbstractService implements EventManagerAwareInterface
 {
     use EventProvider;
+    use EntityManagerAwareTrait;
     
     /**
 	 * default offset value for index method-
@@ -48,11 +50,6 @@ class AbstractService implements EventManagerAwareInterface
      * @var unknown_type
      */
     protected $serviceManager;
-    
-    /**
-     * @var Doctrine\ORM\EntityManager
-     */
-    protected $entityManager;
     
     /**
      * Qualified name of entity to work with
@@ -387,26 +384,6 @@ class AbstractService implements EventManagerAwareInterface
             }
         }    
         return $this;
-    }
-    
-    /**
-     * set the entity manager
-     * @param EntityManager $em
-     * @return $this
-     */
-    public function setEntityManager(EntityManager $em)
-    {
-        $this->entityManager = $em;
-        return $this;
-    }
-    
-    /**
-     * get the currently set Entity Manager
-     * @return EntityManager
-     */
-    public function getEntityManager()
-    {
-        return $this->entityManager;
     }
     
     /**

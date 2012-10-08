@@ -16,18 +16,28 @@ class Module implements
     public function onBootstrap($e)
     {
         $app = $e->getApplication();
-        $events = $app->getEventManager()->getSharedManager();
         $sm = $app->getServiceManager();
         $em = $sm->get('doctrine.entitymanager.orm_default');
-        
-        Type::overrideType('datetime', 'ZucchiDoctrine\Datatype\DateTimeType');
-        Type::overrideType('date', 'ZucchiDoctrine\Datatype\DateType');
-        Type::overrideType('time', 'ZucchiDoctrine\Datatype\TimeType');
-        
-        Type::addType('money', 'ZucchiDoctrine\Datatype\MoneyType');
-        $em->getConnection()
-           ->getDatabasePlatform()
-           ->registerDoctrineTypeMapping('money', 'money');
+
+
+        $controllerLoader = $sm->get('ControllerLoader');
+        $controllerLoader->addInitializer(function ($instance) use ($em) {
+            if (method_exists($instance, 'setEntityManager')) {
+                $instance->setEntityManager($em);
+            }
+        });
+
+        $serviceLoader = $sm->get('ServiceManager');
+        $serviceLoader->addInitializer(function ($instance) use ($em) {
+            if (method_exists($instance, 'setEntityManager')) {
+                $instance->setEntityManager($em);
+            }
+        });
+
+        $events = $app->getEventManager();
+        $layoutListener = $sm->get('zucchidoctrine.listener');
+        $layoutListener->attach($events);
+
     }
     
     public function getAutoloaderConfig()
