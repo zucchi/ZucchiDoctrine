@@ -76,16 +76,17 @@ class DoctrineListener implements ListenerAggregateInterface
 
         $options = $annotation->getOptions();
 
-        if (!isset($options['target_element']['type'])) {
+        if (!isset($options['target_element']['composedObject'])) {
             return;
         }
 
         $elementSpec = $event->getParam('elementSpec');
 
         $annotationManager = $event->getTarget();
-        $specification = $annotationManager->getFormSpecification($options['target_element']['type']);
+        $specification = $annotationManager->getFormSpecification($options['target_element']['composedObject']);
 
         $specification['type'] = 'Zend\Form\Fieldset';
+        $specification['object'] = $options['target_element']['composedObject'];
 
         $elementSpec['spec']['options']['target_element'] = $specification;
     }
