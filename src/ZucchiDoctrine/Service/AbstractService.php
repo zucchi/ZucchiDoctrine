@@ -157,6 +157,8 @@ class AbstractService implements EventManagerAwareInterface
      */
     public function save(AbstractEntity $entity)
     {
+//        var_dump($entity->Schedule->toArray());
+
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
         return $entity;

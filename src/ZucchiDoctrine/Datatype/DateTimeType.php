@@ -33,8 +33,9 @@ class DateTimeType extends Type
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        return ($value !== null)
-            ? $value->format($platform->getDateTimeFormatString()) : null;
+        return ($value instanceof \DateTime)
+            ? $value->format($platform->getDateTimeFormatString())
+            : date($platform->getDateTimeFormatString(), strtotime($value));
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform)
