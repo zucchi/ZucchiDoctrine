@@ -138,11 +138,14 @@ class DoctrineEntity extends DoctrineObjectHydrator
             $collection = new ArrayCollection();
         }
 
+        $keepers = array();
+
         foreach($valueOrObject as $value) {
              if (isset($value->id) &&
                  strlen($value->id) &&
                  $found = $this->find($target, $value->id)
              ) {
+                 $keepers[] = $found->id;
                  $this->hydrate($value->toArray(),$found);
              } else {
                  $value->id = null;
@@ -156,6 +159,12 @@ class DoctrineEntity extends DoctrineObjectHydrator
                  $collection->add($value);
              }
         }
+
+        $collection->forAll(function($key, $element) use ($collection, $keepers) {
+            if (strlen($element->id) && !in_array($element->id, $keepers)) {
+                $collection->remove($key);
+            }
+        });
 
         return $collection;
     }
