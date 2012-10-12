@@ -28,7 +28,7 @@
             "ZucchiDoctrine": "src/"
         },
         "classmap": [
-            "./"
+            "./Module.php"
         ]
     }
 }
