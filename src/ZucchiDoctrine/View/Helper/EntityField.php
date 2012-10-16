@@ -31,8 +31,8 @@ class EntityField extends AbstractHelper
      */
     public function __invoke(AbstractEntity $entity, $field, ClassMetadata $metadata = null)
     {
-        if (strpos($field, '->')) {
-            list($Assoc, $field) = explode('->',$field, 2);
+        if (strpos($field, '.')) {
+            list($Assoc, $field) = explode('.',$field, 2);
             return $this->__invoke($entity->{$Assoc}, $field);
 
         } else {
