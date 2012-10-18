@@ -12,7 +12,7 @@ use Doctrine\ODM\DocumentManager;
 
 /**
  * Trait providing document manager functionality
- * 
+ *
  * @author Matt Cockayne <matt@zucchi.co.uk>
  * @package ZucchiDoctrine
  * @subpackage DocumentManager
@@ -30,7 +30,7 @@ trait DocumentManagerAwareTrait
      * @param EntityManager $em
      * @return $this
      */
-    public function setDocumentManager(EntityManager $em)
+    public function setDocumentManager(DocumentManager $em)
     {
         $this->entityManager = $em;
         return $this;
