@@ -8,7 +8,7 @@
  */
 namespace ZucchiDoctrine\DocumentManager;
 
-use Doctrine\ODM\DocumentManager;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * Trait providing document manager functionality
