@@ -8,7 +8,7 @@
  */
 namespace ZucchiDoctrine\DocumentManager;
 
-use Doctrine\ODM\DocumentyManager;
+use Doctrine\ODM\DocumentManager;
 
 /**
  * Interface for enforcing Document Manager Awareness
