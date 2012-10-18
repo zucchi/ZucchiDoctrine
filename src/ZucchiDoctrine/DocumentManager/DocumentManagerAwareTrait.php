@@ -30,9 +30,9 @@ trait DocumentManagerAwareTrait
      * @param EntityManager $em
      * @return $this
      */
-    public function setDocumentManager(DocumentManager $em)
+    public function setDocumentManager(DocumentManager $dm)
     {
-        $this->entityManager = $em;
+        $this->documentManager = $dm;
         return $this;
     }
 
