@@ -33,14 +33,20 @@ class EntityField extends AbstractHelper
     {
         if (strpos($field, '.')) {
             list($Assoc, $field) = explode('.',$field, 2);
-            return $this->__invoke($entity->{$Assoc}, $field);
+            if (!property_exists($entity, $Assoc)) {
+                throw new \RuntimeException('Invalid Association found: ' . get_class($entity). '#' . $Assoc);
+            } else if ($entity->{$Assoc} != null) {
+                return $this->__invoke($entity->{$Assoc}, $field);
+            }
+
+            return null;
 
         } else {
             if (property_exists('__isInitialised__',$entity) && $entity->__isInitialized__) {
                 // entity is an uninitialised proxy, lets load it
                 $entity->load();
             }
-            if (!isset($entity->{$field})) {
+            if (!property_exists($entity, $field)) {
                 throw new \RuntimeException('Field "' . $field . '" not found in Entity: ' . get_class($entity));
             }
 
