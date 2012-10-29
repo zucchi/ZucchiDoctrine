@@ -11,6 +11,7 @@ return array(
                     'date' => 'ZucchiDoctrine\Datatype\DateType',
                     'time' => 'ZucchiDoctrine\Datatype\TimeType',
                     'money' => 'ZucchiDoctrine\Datatype\MoneyType',
+                    'image' => 'ZucchiDoctrine\Datatype\ImageType',
                 ),
             ),
         ),
@@ -18,6 +19,7 @@ return array(
             'orm_default' => array(
                 'doctrine_type_mappings' => array(
                     'money' => 'money',
+                    'image' => 'image',
                 ),
             ),
         ),
@@ -38,6 +40,7 @@ return array(
     'service_manager' => array(
         'invokables' => array(
             'zucchidoctrine.listener' => 'ZucchiDoctrine\Event\DoctrineListener',
+            'zucchidoctrine.entityhydrator' => 'ZucchiDoctrine\Hydrator\DoctrineEntity'
         ),
     ),
     'view_helpers' => array(

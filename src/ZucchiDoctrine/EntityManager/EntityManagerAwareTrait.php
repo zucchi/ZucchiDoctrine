@@ -9,6 +9,7 @@
 namespace ZucchiDoctrine\EntityManager;
 
 use Doctrine\ORM\EntityManager;
+use Zend\ServiceManager\ServiceManager;
 
 trait EntityManagerAwareTrait
 {
@@ -35,7 +36,10 @@ trait EntityManagerAwareTrait
     public function getEntityManager()
     {
         if (!$this->entityManager && method_exists($this, 'getServiceManager')) {
-            $this->entityManager = $this->getServiceManager()->get('doctrine.entitymanager.orm_default');
+            $sm = $this->getServiceManager();
+            if ($sm instanceof ServiceManager) {
+               $this->entityManager = $sm->get('doctrine.entitymanager.orm_default');
+            }
         }
         return $this->entityManager;
     }

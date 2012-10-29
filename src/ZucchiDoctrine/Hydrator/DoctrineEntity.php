@@ -22,9 +22,15 @@ namespace ZucchiDoctrine\Hydrator;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineObjectHydrator;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
+use Zend\Stdlib\Hydrator\AbstractHydrator;
+use Zend\Stdlib\Hydrator\HydratorInterface;
+use Zend\Stdlib\Hydrator\Reflection as ReflectionHydrator;
 use Zend\Stdlib\Hydrator\ObjectProperty as ObjectPropertyHydrator;
+use ZucchiDoctrine\EntityManager\EntityManagerAwareTrait;
+use Zucchi\ServiceManager\ServiceManagerAwareTrait;
+
 
 /**
  * This hydrator is used as an optimization purpose for Doctrine ORM, and retrieves references to
@@ -35,34 +41,67 @@ use Zend\Stdlib\Hydrator\ObjectProperty as ObjectPropertyHydrator;
  * @since   0.5.0
  * @author  Michaël Gallego <mic.gallego@gmail.com>
  */
-class DoctrineEntity extends DoctrineObjectHydrator
+class DoctrineEntity extends AbstractHydrator
 {
+    use EntityManagerAwareTrait;
 
     /**
-     * @param ObjectManager     $objectManager
+     * @var ClassMetadata
+     */
+    protected $metadata;
+
+    /**
+     * @var HydratorInterface
+     */
+    protected $hydrator;
+
+    /**
+     * @param EntityManager     $entityManager
      * @param HydratorInterface $hydrator
      */
-    public function __construct(ObjectManager $objectManager, HydratorInterface $hydrator = null)
+    public function __construct(EntityManager $entityManager = null, HydratorInterface $hydrator = null)
     {
-        $this->objectManager = $objectManager;
+        if ($entityManager) {
+            $this->setEntityManager($entityManager);
+        }
 
         if (null === $hydrator) {
-            $hydrator = new ObjectPropertyHydrator(false);
+            $hydrator = new ReflectionHydrator(false);
         }
 
         $this->setHydrator($hydrator);
     }
 
     /**
-     * {@inheritDoc}
+     * @param HydratorInterface $hydrator
+     * @return DoctrineObject
      */
-    protected function find($target, $identifiers)
+    public function setHydrator(HydratorInterface $hydrator)
     {
-        /* @var $entityManager \Doctrine\ORM\EntityManager */
-        $entityManager = $this->objectManager;
+        $this->hydrator = $hydrator;
 
-        return $entityManager->getReference($target, $identifiers);
+        return $this;
     }
+
+    /**
+     * @return HydratorInterface
+     */
+    public function getHydrator()
+    {
+        return $this->hydrator;
+    }
+
+    /**
+     * Extract values from an object
+     *
+     * @param  object $object
+     * @return array
+     */
+    public function extract($object)
+    {
+        return $this->hydrator->extract($object);
+    }
+
 
     /**
      * Hydrate $object with the provided $data.
@@ -74,7 +113,7 @@ class DoctrineEntity extends DoctrineObjectHydrator
      */
     public function hydrate(array $data, $object)
     {
-        $this->metadata = $this->objectManager->getClassMetadata(get_class($object));
+        $this->metadata = $this->getEntityManager()->getClassMetadata(get_class($object));
 
         foreach($data as $field => &$value) {
             if ($value === null) {
@@ -141,12 +180,17 @@ class DoctrineEntity extends DoctrineObjectHydrator
         $keepers = array();
 
         foreach($valueOrObject as $value) {
-             if (isset($value->id) &&
-                 strlen($value->id) &&
-                 $found = $this->find($target, $value->id)
+            if (method_exists($value, 'toArray')) {
+                $value = $value->toArray();
+            } else if (!is_array($value) && !$value instanceof Traversable) {
+                $value = (array) $value;
+            }
+             if (isset($value['id']) &&
+                 strlen($value['id']) &&
+                 $found = $this->find($target, $value['id'])
              ) {
                  $keepers[] = $found->id;
-                 $this->hydrate($value->toArray(),$found);
+                 $this->hydrate($value,$found);
              } else {
                  $value->id = null;
                  if ($collection instanceof PersistentCollection) {
@@ -167,5 +211,44 @@ class DoctrineEntity extends DoctrineObjectHydrator
         });
 
         return $collection;
+    }
+
+    /**
+     * This function tries, given an array of data, to convert it to an object if the given array contains
+     * an identifier for the object. This is useful in a context of updating existing entities, without ugly
+     * tricks like setting manually the existing id directly into the entity
+     *
+     * @param  array  $data
+     * @param  object $object
+     * @return object
+     */
+    protected function tryConvertArrayToObject($data, $object)
+    {
+        $identifierNames  = $this->metadata->getIdentifierFieldNames($object);
+        $identifierValues = array();
+
+        if (empty($identifierNames)) {
+            return $object;
+        }
+
+        foreach ($identifierNames as $identifierName) {
+            if (!isset($data[$identifierName]) || empty($data[$identifierName])) {
+                return $object;
+            }
+
+            $identifierValues[$identifierName] = $data[$identifierName];
+        }
+
+        return $this->find(get_class($object), $identifierValues);
+    }
+
+    /**
+     * @param  string    $target
+     * @param  mixed     $identifiers
+     * @return object
+     */
+    protected function find($target, $identifiers)
+    {
+        return $this->getEntityManager()->getReference($target, $identifiers);
     }
 }

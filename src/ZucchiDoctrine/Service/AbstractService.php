@@ -15,6 +15,7 @@ use ZucchiDoctrine\Entity\AbstractEntity;
 use ZucchiDoctrine\EntityManager\EntityManagerAwareTrait;
 use Zucchi\Event\EventProviderTrait as EventProvider;
 use Zucchi\Debug\Debug;
+use Zucchi\ServiceManager\ServiceManagerAwareTrait;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
@@ -32,6 +33,7 @@ class AbstractService implements EventManagerAwareInterface
 {
     use EventProvider;
     use EntityManagerAwareTrait;
+    use ServiceManagerAwareTrait;
     
     /**
 	 * default offset value for index method-
@@ -45,12 +47,6 @@ class AbstractService implements EventManagerAwareInterface
 	 */
 	const INDEX_LIMIT = 25;
 	
-    /**
-     * 
-     * @var unknown_type
-     */
-    protected $serviceManager;
-    
     /**
      * Qualified name of entity to work with
      * @var string
@@ -385,17 +381,6 @@ class AbstractService implements EventManagerAwareInterface
                 $qb->setFirstResult($offset);
             }
         }    
-        return $this;
-    }
-    
-    /**
-     * 
-     * @param ServiceManager $serviceManager
-     * @return \ZucchiDoctrine\Service\AbstractService
-     */
-    public function setServiceManager(ServiceManager $serviceManager)
-    {
-        $this->serviceManager = $serviceManager;
         return $this;
     }
 }
