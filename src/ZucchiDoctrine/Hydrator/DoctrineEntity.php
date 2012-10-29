@@ -185,23 +185,26 @@ class DoctrineEntity extends AbstractHydrator
             } else if (!is_array($value) && !$value instanceof Traversable) {
                 $value = (array) $value;
             }
-             if (isset($value['id']) &&
-                 strlen($value['id']) &&
-                 $found = $this->find($target, $value['id'])
-             ) {
-                 $keepers[] = $found->id;
-                 $this->hydrate($value,$found);
-             } else {
-                 $value->id = null;
-                 if ($collection instanceof PersistentCollection) {
-                    if ($owner = $collection->getOwner()) {
-                        $mapping = $collection->getMapping();
-                        $mappedBy = $mapping['mappedBy'];
-                        $value->{$mappedBy} = $owner;
-                    }
-                 }
-                 $collection->add($value);
-             }
+
+            if (isset($value['id']) &&
+                strlen($value['id']) &&
+                $found = $this->find($target, $value['id'])
+            ) {
+                $keepers[] = $found->id;
+                $this->hydrate($value,$found);
+            } else {
+                $obj = new $target();
+                $obj->fromArray($value);
+                $obj->id = null;
+                if ($collection instanceof PersistentCollection) {
+                   if ($owner = $collection->getOwner()) {
+                       $mapping = $collection->getMapping();
+                       $mappedBy = $mapping['mappedBy'];
+                       $obj->{$mappedBy} = $owner;
+                   }
+                }
+                $collection->add($obj);
+            }
         }
 
         $collection->forAll(function($key, $element) use ($collection, $keepers) {
