@@ -170,19 +170,31 @@ class AbstractService implements EventManagerAwareInterface
         if (!$id) {
             return 0;
         }
-        
-        if (!is_array($id)) {
-            $id = array($id);
+
+        if ($id instanceof AbstractEntity) {
+            $this->entityManager->remove($id);
+            $result =  $this->entityManager->flush();
+        } else {
+
+            if (!is_array($id)) {
+                $id = array($id);
+            }
+
+            $qb = $this->entityManager->createQueryBuilder();
+            $qb->delete($this->entityName, $this->alias)
+               ->where($this->alias . '.' . $this->identifier . ' IN (:ids)')
+               ->setParameter('ids', $id);
+
+            $result = $qb->getQuery()->execute();
         }
         
-        $qb = $this->entityManager->createQueryBuilder();
-        $qb->delete($this->entityName, $this->alias)
-           ->where($this->alias . '.' . $this->identifier . ' IN (:ids)')
-           ->setParameter('ids', $id);
-        
-        $result = $qb->getQuery()->execute();
-        
         return $result;
+    }
+
+    public function refresh(AbstractEntity $entity)
+    {
+        $this->entityManager->refresh($entity);
+        return $entity;
     }
     
     /**
@@ -270,7 +282,15 @@ class AbstractService implements EventManagerAwareInterface
                         $stmt = $expr->between($alias . '.' . $col, $from, $to);
                         $whereExp->add($stmt);
                     }
-                    
+
+                } else if ($operator == 'is') {
+                    $expr= new Expr();
+                    $method = 'is' . ucfirst($val[0]);
+                    if (method_exists($expr, $method)) {
+                        $stmt = $expr->{$method}($alias . '.' . $col);
+                        $whereExp->add($stmt);
+                    }
+
                 } else {
                     // this holds the subquery for this field, each component being an OR
                     $subWhereExp = $qb->expr()->orX();
