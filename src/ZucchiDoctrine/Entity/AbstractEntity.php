@@ -38,6 +38,15 @@ class AbstractEntity implements
     protected $id;
 
     /**
+     * @var integer
+     * @ORM\Version
+     * @ORM\Column(type="integer")
+     * @Form\Exclude
+     */
+    protected $version;
+
+
+    /**
      * magic getter
      *
      * @param $property
@@ -48,10 +57,16 @@ class AbstractEntity implements
         return $this->{$key};
     }
 
+    /**
+     * Magic setter
+     * @param $key
+     * @param $value
+     */
     public function __set($key, $value)
     {
         $this->{$key} = $value;
     }
+
 
     /**
      * return public and protected properties as an array

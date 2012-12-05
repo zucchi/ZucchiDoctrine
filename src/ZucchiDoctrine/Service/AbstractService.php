@@ -21,6 +21,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\LockMode;
 
 /**
  * Abstract Service
@@ -141,9 +142,33 @@ class AbstractService implements EventManagerAwareInterface
         if (!$this->entityName) {
             throw new \RuntimeException('No Entity defined for ' . get_called_class() . ' service');
         }
-        
-        $result = $this->entityManager->find($this->entityName, $id);
+
+        $result = $this->entityManager->find($this->entityName, $id, LockMode::OPTIMISTIC);
         return $result;
+    }
+
+    public function refresh(AbstractEntity $entity)
+    {
+        $this->entityManager->refresh($entity);
+        $metaData = $this->entityManager->getClassMetaData($this->entityName);
+        $mappings = $metaData->getAssociationMappings();
+
+        foreach ($mappings as $mapping) {
+            $fieldName = $mapping['fieldName'];
+            $assoc = $entity->{$fieldName};
+
+            if ($assoc instanceof \Traversable) {
+                foreach($assoc as $ent) {
+                    if ($ent instanceof AbstractEntity) {
+                        $this->entityManager->refresh($ent);
+                    }
+                }
+            } else if ($assoc instanceof AbstractEntity) {
+                $this->entityManager->refresh($assoc);
+            }
+        }
+
+        return $this;
     }
     
     /**
@@ -191,12 +216,6 @@ class AbstractService implements EventManagerAwareInterface
         return $result;
     }
 
-    public function refresh(AbstractEntity $entity)
-    {
-        $this->entityManager->refresh($entity);
-        return $entity;
-    }
-    
     /**
      * build where statement and add to the query builder
      * 
