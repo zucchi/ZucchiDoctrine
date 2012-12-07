@@ -30,6 +30,7 @@ use Zend\Stdlib\Hydrator\Reflection as ReflectionHydrator;
 use Zend\Stdlib\Hydrator\ObjectProperty as ObjectPropertyHydrator;
 use ZucchiDoctrine\EntityManager\EntityManagerAwareTrait;
 use Zucchi\ServiceManager\ServiceManagerAwareTrait;
+use ZucchiDoctrine\Entity\AbstractEntity;
 
 
 /**
@@ -41,7 +42,7 @@ use Zucchi\ServiceManager\ServiceManagerAwareTrait;
  * @since   0.5.0
  * @author  Michaël Gallego <mic.gallego@gmail.com>
  */
-class DoctrineEntity extends AbstractHydrator
+class DoctrineEntity extends ReflectionHydrator
 {
     use EntityManagerAwareTrait;
 
@@ -59,36 +60,12 @@ class DoctrineEntity extends AbstractHydrator
      * @param EntityManager     $entityManager
      * @param HydratorInterface $hydrator
      */
-    public function __construct(EntityManager $entityManager = null, HydratorInterface $hydrator = null)
+    public function __construct(EntityManager $entityManager = null)
     {
         if ($entityManager) {
             $this->setEntityManager($entityManager);
         }
-
-        if (null === $hydrator) {
-            $hydrator = new ReflectionHydrator(false);
-        }
-
-        $this->setHydrator($hydrator);
-    }
-
-    /**
-     * @param HydratorInterface $hydrator
-     * @return DoctrineObject
-     */
-    public function setHydrator(HydratorInterface $hydrator)
-    {
-        $this->hydrator = $hydrator;
-
-        return $this;
-    }
-
-    /**
-     * @return HydratorInterface
-     */
-    public function getHydrator()
-    {
-        return $this->hydrator;
+        parent::__construct();
     }
 
     /**
@@ -99,7 +76,19 @@ class DoctrineEntity extends AbstractHydrator
      */
     public function extract($object)
     {
-        return $this->hydrator->extract($object);
+        $result = array();
+        foreach (self::getReflProperties($object) as $property) {
+            $propertyName = $property->getName();
+
+            $value = $property->getValue($object);
+            if ($value instanceof AbstractEntity) {
+                $result[$propertyName] = $value->toArray(true);
+            } else {
+                $result[$propertyName] = $this->extractValue($propertyName, $value);
+            }
+        }
+
+        return $result;
     }
 
 
@@ -143,7 +132,14 @@ class DoctrineEntity extends AbstractHydrator
             }
         }
 
-        return $this->hydrator->hydrate($data, $object);
+        $reflProperties = self::getReflProperties($object);
+        foreach ($data as $key => $value) {
+            if (isset($reflProperties[$key])) {
+                $reflProperties[$key]->setValue($object, $this->hydrateValue($key, $value));
+            }
+        }
+        return $object;
+
     }
 
     /**
@@ -159,7 +155,13 @@ class DoctrineEntity extends AbstractHydrator
 
         $id = (is_array($valueOrObject)) ? $valueOrObject['id'] : $valueOrObject->id;
 
-        return $this->find($target, $id);
+        if ($id > 0){
+            $entity = $this->find($target, $id);
+        }else{
+            $entity = new $target();
+        }
+
+        return $this->hydrate($valueOrObject, $entity);
     }
 
     /**
