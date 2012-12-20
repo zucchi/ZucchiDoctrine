@@ -36,7 +36,7 @@ trait TimestampableTrait
      *     }
      * })
      */
-    public $createdAt;
+    protected $createdAt;
 
     /**
      * @Gedmo\Timestampable(on="update")
@@ -53,6 +53,6 @@ trait TimestampableTrait
      *     }
      * })
      */
-    public $updatedAt;
+    protected $updatedAt;
     
 }
