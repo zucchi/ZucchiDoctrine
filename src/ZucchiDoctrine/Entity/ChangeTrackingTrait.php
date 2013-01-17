@@ -27,7 +27,7 @@ trait ChangeTrackingTrait
     public function prepareCleanData()
     {
         if (empty($this->cleanData)) {
-            $this->cleanData = $this->toArray();
+            $this->cleanData = $this->toArray(false);
         }
     }
     
