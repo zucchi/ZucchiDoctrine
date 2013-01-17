@@ -38,7 +38,7 @@ trait DocumentManagerAwareTrait
 
     /**
      * get the currently set Entity Manager
-     * @return EntityManager
+     * @return Doctrine\ODM\MongoDB\DocumentManager
      */
     public function getDocumentManager()
     {
