@@ -27,7 +27,7 @@ trait ChangeTrackingTrait
     public function prepareCleanData()
     {
         if (empty($this->cleanData)) {
-            $this->cleanData = $this->toArray();
+            $this->cleanData = $this->toArray(false);
         }
     }
     
@@ -39,15 +39,18 @@ trait ChangeTrackingTrait
      */
     public function getChanges($original = false)
     {
-        $a = $original ? $this->cleanData : $this->toArray();
-        $b = $original ? $this->toArray() : $this->cleanData; 
+        $a = $original ? $this->cleanData : $this->toArray(false);
+        $b = $original ? $this->toArray(false) : $this->cleanData;
         return array_udiff_assoc($a, $b, function($a, $b) {
+
             if (is_array($a) || is_array($b)) {
                 return 0;
             } 
             
-            if ($a !== $b) return 1;
-            
+            if ($a !== $b){
+                return 1;
+            }
+
             return 0;
         });
     }
@@ -61,6 +64,8 @@ trait ChangeTrackingTrait
     public function isChanged($field = null)
     {
         $changes = $this->getChanges();
+            var_dump(__CLASS__ . '->' . __FUNCTION__);
+            var_dump($changes);
         if (null == $field && count($changes)) {
             return true;
         } 
