@@ -17,20 +17,33 @@ class Module implements
     {
         $app = $e->getApplication();
         $sm = $app->getServiceManager();
-        $em = $sm->get('doctrine.entitymanager.orm_default');
-
 
         $controllerLoader = $sm->get('ControllerLoader');
-        $controllerLoader->addInitializer(function ($instance) use ($em) {
+        $controllerLoader->addInitializer(function ($instance) use ($sm) {
             if (method_exists($instance, 'setEntityManager')) {
+                $em = $sm->get('doctrine.entitymanager.orm_default');
                 $instance->setEntityManager($em);
             }
         });
+        $controllerLoader->addInitializer(function ($instance) use ($sm) {
+            if (method_exists($instance, 'setDocumentManager')) {
+                $dm = $sm->get('doctrine.documentmanager.odm_default');
+                $instance->setDocumentManager($dm);
+            }
+        });
+
 
         $serviceLoader = $sm->get('ServiceManager');
-        $serviceLoader->addInitializer(function ($instance) use ($em) {
+        $serviceLoader->addInitializer(function ($instance) use ($sm) {
             if (method_exists($instance, 'setEntityManager')) {
+                $em = $sm->get('doctrine.entitymanager.orm_default');
                 $instance->setEntityManager($em);
+            }
+        });
+        $serviceLoader->addInitializer(function ($instance) use ($sm){
+            if (method_exists($instance, 'setDocumentManager')) {
+                $dm = $sm->get('doctrine.documentmanager.odm_default');
+                $instance->setDocumentManager($dm);
             }
         });
 
