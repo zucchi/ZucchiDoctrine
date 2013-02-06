@@ -30,7 +30,7 @@ return array(
                     'Gedmo\Sluggable\SluggableListener',
                     'Gedmo\SoftDeleteable\SoftDeleteableListener',
                     'Gedmo\Timestampable\TimestampableListener',
-                    'Gedmo\Translatable\TranslatableListener',
+//                    'Gedmo\Translatable\TranslatableListener',
                     'Gedmo\Tree\TreeListener',
                     'Gedmo\Uploadable\UploadableListener',
                 ),

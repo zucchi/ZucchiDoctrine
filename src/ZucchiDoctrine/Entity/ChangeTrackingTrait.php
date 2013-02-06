@@ -64,8 +64,6 @@ trait ChangeTrackingTrait
     public function isChanged($field = null)
     {
         $changes = $this->getChanges();
-            var_dump(__CLASS__ . '->' . __FUNCTION__);
-            var_dump($changes);
         if (null == $field && count($changes)) {
             return true;
         } 
