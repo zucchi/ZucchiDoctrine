@@ -104,31 +104,36 @@ class DoctrineEntity extends ReflectionHydrator
     {
         $this->metadata = $this->getEntityManager()->getClassMetadata(get_class($object));
 
-        foreach($data as $field => &$value) {
-            if ($value === null) {
+        // process fields
+        $fields = $this->metadata->getFieldNames();
+        foreach ($fields as $field) {
+            if (isset($data[$field]) && $data[$field] !== null) {
+                if (in_array($this->metadata->getTypeOfField($field), array('datetime', 'time', 'date'))) {
+                    if (is_int($data[$field])) {
+                        $dt = new \DateTime();
+                        $dt->setTimestamp($data[$field]);
+                        $data[$field] = $dt;
+                    } elseif (is_string($data[$field])) {
+                        $data[$field] = new \DateTime($data[$field]);
+                    }
+                }
+            } else {
                 unset($data[$field]);
                 continue;
             }
+        }
 
-            // @todo DateTime (and other types) conversion should be handled by doctrine itself in future
-            if (in_array($this->metadata->getTypeOfField($field), array('datetime', 'time', 'date'))) {
-                if (is_int($value)) {
-                    $dt = new \DateTime();
-                    $dt->setTimestamp($value);
-                    $value = $dt;
-                } elseif (is_string($value)) {
-                    $value = new \DateTime($value);
-                }
-            }
+        // process associations
+        $assocs = $this->metadata->getAssociationNames();
+        foreach($assocs as $assoc) {
+            $target = $this->metadata->getAssociationTargetClass($assoc);
 
-            if ($this->metadata->hasAssociation($field)) {
-                $target = $this->metadata->getAssociationTargetClass($field);
+            $value = (isset($data[$assoc])) ? $data[$assoc] : null;
 
-                if ($this->metadata->isSingleValuedAssociation($field)) {
-                    $value = $this->toOne($value, $target);
-                } elseif ($this->metadata->isCollectionValuedAssociation($field)) {
-                    $value = $this->toMany($value, $target, $object->{$field});
-                }
+            if ($this->metadata->isSingleValuedAssociation($assoc)) {
+                $data[$assoc] = $this->toOne($value, $target);
+            } elseif ($this->metadata->isCollectionValuedAssociation($assoc)) {
+                $data[$assoc] = $this->toMany($value, $target, $object->{$assoc});
             }
         }
 
@@ -138,6 +143,7 @@ class DoctrineEntity extends ReflectionHydrator
                 $reflProperties[$key]->setValue($object, $this->hydrateValue($key, $value));
             }
         }
+
         return $object;
 
     }
@@ -149,7 +155,7 @@ class DoctrineEntity extends ReflectionHydrator
      */
     protected function toOne($valueOrObject, $target)
     {
-        if ($valueOrObject instanceof $target) {
+        if ($valueOrObject instanceof $target || $valueOrObject == null) {
             return $valueOrObject;
         }
 
@@ -187,7 +193,6 @@ class DoctrineEntity extends ReflectionHydrator
             } else if (!is_array($value) && !$value instanceof Traversable) {
                 $value = (array) $value;
             }
-
             if (isset($value['id']) &&
                 strlen($value['id']) &&
                 $found = $this->find($target, $value['id'])
