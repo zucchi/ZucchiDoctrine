@@ -8,7 +8,6 @@
  */
 namespace ZucchiDoctrine\Service;
 
-use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\EventManager\EventManagerAwareInterface;
 
 use ZucchiDoctrine\Entity\AbstractEntity;
@@ -18,7 +17,6 @@ use Zucchi\Debug\Debug;
 use Zucchi\ServiceManager\ServiceManagerAwareTrait;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\LockMode;
@@ -178,8 +176,6 @@ class AbstractService implements EventManagerAwareInterface
      */
     public function save(AbstractEntity $entity)
     {
-//        var_dump($entity->Schedule->toArray());
-
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
         return $entity;
@@ -284,9 +280,6 @@ class AbstractService implements EventManagerAwareInterface
                 if (!is_array($val)) {
                     $val = array($val);
                 }
-                
-                // process each item in the list of values
-                $queryComponent = array();
                 
                 if ($operator == 'regexp') {
                     $whereExp->add("REGEXP(" . $alias . '.' . $col . ",'" . $val[0] . "') = 1");
