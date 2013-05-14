@@ -14,20 +14,23 @@ use Doctrine\ODM\MongoDB\DocumentManager;
  * Trait providing document manager functionality
  *
  * @author Matt Cockayne <matt@zucchi.co.uk>
+ * @author Rick Nicol <rick@zucchi.co.uk>
  * @package ZucchiDoctrine
  * @subpackage DocumentManager
  */
-
 trait DocumentManagerAwareTrait
 {
     /**
-     * @var Doctrine\ORM\EntityManager
+     * Document Manager.
+     *
+     * @var \Doctrine\ORM\EntityManager
      */
     protected $documentManager;
 
     /**
-     * set the entity manager
-     * @param EntityManager $em
+     * Set Document Manager.
+     *
+     * @param DocumentManager $dm
      * @return $this
      */
     public function setDocumentManager(DocumentManager $dm)
@@ -37,8 +40,9 @@ trait DocumentManagerAwareTrait
     }
 
     /**
-     * get the currently set Entity Manager
-     * @return Doctrine\ODM\MongoDB\DocumentManager
+     * Get the currently set Document Manager.
+     *
+     * @return \Doctrine\ODM\MongoDB\DocumentManager
      */
     public function getDocumentManager()
     {

@@ -18,7 +18,7 @@
     "require": {
         "php": ">=5.4.1",
         "zucchi/zucchi": "dev-master",
-        "doctrine/doctrine-module": ">=0.5.2",
+        "doctrine/doctrine-module": "dev-master",
         "doctrine/doctrine-orm-module": "dev-master",
         "doctrine/data-fixtures": "1.*",
         "doctrine/doctrine-mongo-odm-module": "dev-master",
