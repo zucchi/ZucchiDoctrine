@@ -54,5 +54,4 @@ trait TimestampableTrait
      * })
      */
     protected $updatedAt;
-    
 }
