@@ -21,7 +21,6 @@
         "doctrine/doctrine-module": ">=0.5.2",
         "doctrine/doctrine-orm-module": "dev-master",
         "doctrine/data-fixtures": "1.*",
-        "doctrine/doctrine-mongo-odm-module": "dev-master",
         "gedmo/doctrine-extensions": "dev-master"
     },
     "autoload": {
