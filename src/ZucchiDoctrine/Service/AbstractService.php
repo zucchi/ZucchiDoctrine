@@ -3,12 +3,11 @@
  * ZucchiDoctrine (http://zucchi.co.uk)
  *
  * @link      http://github.com/zucchi/ZucchiDoctrine for the canonical source repository
- * @copyright Copyright (c) 2005-2012 Zucchi Limited. (http://zucchi.co.uk)
+ * @copyright Copyright (c) 2005-2013 Zucchi Limited. (http://zucchi.co.uk)
  * @license   http://zucchi.co.uk/legals/bsd-license New BSD License
  */
 namespace ZucchiDoctrine\Service;
 
-use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\EventManager\EventManagerAwareInterface;
 
 use ZucchiDoctrine\Entity\AbstractEntity;
@@ -18,7 +17,6 @@ use Zucchi\Debug\Debug;
 use Zucchi\ServiceManager\ServiceManagerAwareTrait;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\LockMode;
@@ -27,7 +25,8 @@ use Doctrine\DBAL\LockMode;
  * Abstract Service
  *
  * @author Matt Cockayne <matt@zucchi.co.uk>
- * @package ZucchiDoctrine 
+ * @author Rick Nicol <rick@zucchi.co.uk>
+ * @package ZucchiDoctrine
  * @subpackage Service
  */
 class AbstractService implements EventManagerAwareInterface
@@ -37,37 +36,45 @@ class AbstractService implements EventManagerAwareInterface
     use ServiceManagerAwareTrait;
     
     /**
-	 * default offset value for index method-
+	 * Default offset value for index method.
+     *
 	 * @var integer
 	 */
 	const INDEX_OFFSET = 0;
 	
 	/**
-	 * default limit for index method
+	 * Default limit for index method.
+     *
 	 * @var integer
 	 */
 	const INDEX_LIMIT = 25;
 	
     /**
-     * Qualified name of entity to work with
+     * Qualified name of entity to work with.
+     *
      * @var string
      */
     protected $entityName;
     
     /**
-     * the default alias key for queries, 'e' for entity
+     * The default alias key for queries, 'e' for entity.
+     *
      * @var string
      */
     protected $alias = 'e';
     
     /**
-     * The identifying field for the entity
+     * The identifying field for the entity.
+     *
+     * @var string
      */
     protected $identifier = 'id';
     
     /**
-     * get the metadata for the defined entity
+     * Get the metadata for the defined entity.
+     *
      * @return ClassMetadata
+     * @throws \RuntimeException
      */
     public function getMetadata()
     {
@@ -81,7 +88,7 @@ class AbstractService implements EventManagerAwareInterface
     }
     
     /**
-     * get a new instance of the entity
+     * Get a new instance of the entity.
      * 
      * @return AbstractEntity
      */
@@ -92,7 +99,7 @@ class AbstractService implements EventManagerAwareInterface
     }
     
     /**
-     * get a list of entities
+     * Get a list of entities.
      * 
      * @param array $where
      * @param array $order
@@ -100,7 +107,8 @@ class AbstractService implements EventManagerAwareInterface
      * @param int $offset
      * @param int $hydrate
      * @param array $options
-     * @return array|Collection
+     * @return mixed
+     * @throws \RuntimeException
      */
     public function getList(
         $where = array(), 
@@ -134,8 +142,11 @@ class AbstractService implements EventManagerAwareInterface
     }
     
     /**
-     * get a a specific entity
-     * @param array $filter
+     * Get a a specific entity.
+     *
+     * @param int $id
+     * @return mixed
+     * @throws \RuntimeException
      */
     public function get($id)
     {
@@ -147,6 +158,12 @@ class AbstractService implements EventManagerAwareInterface
         return $result;
     }
 
+    /**
+     * Refresh entity.
+     *
+     * @param AbstractEntity $entity
+     * @return $this
+     */
     public function refresh(AbstractEntity $entity)
     {
         $this->entityManager->refresh($entity);
@@ -172,21 +189,21 @@ class AbstractService implements EventManagerAwareInterface
     }
     
     /**
-     * Save the supplied entity
+     * Save the supplied entity.
+     *
      * @param AbstractEntity $entity
      * @return AbstractEntity
      */
     public function save(AbstractEntity $entity)
     {
-//        var_dump($entity->Schedule->toArray());
-
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
         return $entity;
     }
     
     /**
-     * Delete the specified entities by id
+     * Delete the specified entities by id.
+     *
      * @param integer|string|array $id
      * @return integer the number of rows affected
      */
@@ -217,9 +234,9 @@ class AbstractService implements EventManagerAwareInterface
     }
 
     /**
-     * build where statement and add to the query builder
+     * Build where statement and add to the query builder.
      * 
-     * @param Doctrine\Orm\QueryBuilder $qb
+     * @param \Doctrine\Orm\QueryBuilder $qb
      * @param mixed $where
      * @return $this
      */
@@ -285,9 +302,6 @@ class AbstractService implements EventManagerAwareInterface
                     $val = array($val);
                 }
                 
-                // process each item in the list of values
-                $queryComponent = array();
-                
                 if ($operator == 'regexp') {
                     $whereExp->add("REGEXP(" . $alias . '.' . $col . ",'" . $val[0] . "') = 1");
                     
@@ -352,9 +366,9 @@ class AbstractService implements EventManagerAwareInterface
     }
     
     /**
-     * build and add an oder field to the query builder
+     * Build and add an oder field to the query builder.
      * 
-     * @param Doctrine\Orm\QueryBuilder $qb
+     * @param \Doctrine\Orm\QueryBuilder $qb
      * @param mixed $order
      * @return Gmg_Service_Abstract
      */
@@ -404,11 +418,12 @@ class AbstractService implements EventManagerAwareInterface
     }
     
     /**
-     * build and add a limit and offset for the query builder
+     * Build and add a limit and offset for the query builder.
      * 
-     * @param Doctrine\Orm\QueryBuilder $qb
-     * @param integer $limit
-     * @param integer $offset
+     * @param \Doctrine\Orm\QueryBuilder $qb
+     * @param int $limit
+     * @param int $offset
+     * @return $this
      */
     protected function addLimit($qb, $limit, $offset) 
     {
