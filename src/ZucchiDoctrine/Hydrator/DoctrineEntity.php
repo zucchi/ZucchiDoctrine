@@ -31,6 +31,10 @@ use Zend\Stdlib\Hydrator\ObjectProperty as ObjectPropertyHydrator;
 use ZucchiDoctrine\EntityManager\EntityManagerAwareTrait;
 use Zucchi\ServiceManager\ServiceManagerAwareTrait;
 use ZucchiDoctrine\Entity\AbstractEntity;
+use Zucchi\DateTime\DateTime;
+use Zucchi\DateTime\Date;
+use Zucchi\DateTime\Time;
+
 
 
 /**
@@ -78,6 +82,9 @@ class DoctrineEntity extends ReflectionHydrator
     {
         $result = array();
         foreach (self::getReflProperties($object) as $property) {
+
+            $metaData = $this->entityManager->getClassMetadata(get_class($object));
+
             $propertyName = $property->getName();
 
             $value = $property->getValue($object);
@@ -102,20 +109,33 @@ class DoctrineEntity extends ReflectionHydrator
      */
     public function hydrate(array $data, $object)
     {
-        $this->metadata = $this->getEntityManager()->getClassMetadata(get_class($object));
+        $metadata = $this->getEntityManager()->getClassMetadata(get_class($object));
 
         // process fields
-        $fields = $this->metadata->getFieldNames();
+        $fields = $metadata->getFieldNames();
         foreach ($fields as $field) {
             if (isset($data[$field]) && $data[$field] !== null) {
-                if (in_array($this->metadata->getTypeOfField($field), array('datetime', 'time', 'date'))) {
-                    if (is_int($data[$field])) {
-                        $dt = new \DateTime();
-                        $dt->setTimestamp($data[$field]);
-                        $data[$field] = $dt;
-                    } elseif (is_string($data[$field])) {
-                        $data[$field] = new \DateTime($data[$field]);
+                $type = $metadata->getTypeOfField($field);
+                if (in_array($type, array('datetime', 'time', 'date'))) {
+                    switch ($type) {
+                        case 'datetime':
+                            $dt = new DateTime();
+                            break;
+                        case 'date':
+                            $dt = new Date();
+                            break;
+                        case 'time':
+                            $dt = new Time();
+                            break;
                     }
+
+                    if (is_int($data[$field])) {
+                        $dt->setTimestamp($data[$field]);
+                    } elseif (is_string($data[$field])) {
+                        $dt->__construct($data[$field]);
+                    }
+
+                    $data[$field] = $dt;
                 }
             } else {
                 unset($data[$field]);
@@ -123,17 +143,28 @@ class DoctrineEntity extends ReflectionHydrator
             }
         }
 
-        // process associations
-        $assocs = $this->metadata->getAssociationNames();
-        foreach($assocs as $assoc) {
-            $target = $this->metadata->getAssociationTargetClass($assoc);
-
-            $value = (isset($data[$assoc])) ? $data[$assoc] : null;
-
-            if ($this->metadata->isSingleValuedAssociation($assoc)) {
-                $data[$assoc] = $this->toOne($value, $target);
-            } elseif ($this->metadata->isCollectionValuedAssociation($assoc)) {
-                $data[$assoc] = $this->toMany($value, $target, $object->{$assoc});
+        if (!$object instanceof \Doctrine\ORM\Proxy\Proxy) {
+            // process associations only if not proxied to prevent mahoosive nesting issues
+            $assocs = $metadata->getAssociationNames();
+            foreach($assocs as $assoc) {
+                $target = $metadata->getAssociationTargetClass($assoc);
+                $value = (isset($data[$assoc])) ? $data[$assoc] : null;
+                switch ($metadata->getAssociationMapping($assoc)['type']) {
+                    case $metadata::ONE_TO_ONE: // 1
+                        $data[$assoc] = $this->toOne($value, $target);
+                        break;
+                    case $metadata::MANY_TO_ONE: // 2
+                        // Not hydrating just linking
+                        $entity = $this->find($target, $value);
+                        $data[$assoc] = $entity;
+                        break;
+                    case $metadata::ONE_TO_MANY: // 4
+                        $data[$assoc] = $this->toMany($value, $target, $object->{$assoc});
+                        break;
+                    case $metadata::MANY_TO_MANY: // 8
+                        $data[$assoc] = $this->toMany($value, $target, $object->{$assoc});
+                        break;
+                }
             }
         }
 

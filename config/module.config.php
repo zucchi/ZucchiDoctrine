@@ -20,6 +20,8 @@ return array(
                 'doctrine_type_mappings' => array(
                     'money' => 'money',
                     'image' => 'image',
+                    'date' => 'date',
+                    'time' => 'time',
                 ),
             ),
         ),

@@ -10,7 +10,8 @@ namespace ZucchiDoctrine\Datatype;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
-use Zucchi\DateTime\Date as DateTime;
+use Doctrine\DBAL\Types\ConversionException;
+use Zucchi\DateTime\Date as Date;
 
 /**
  * Type that maps an SQL DATETIME/TIMESTAMP to an Extended PHP DateTime object.
@@ -39,11 +40,11 @@ class DateType extends Type
 
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        if ($value === null || $value instanceof DateTime) {
+        if ($value === null || $value instanceof Date) {
             return $value;
         }
 
-        $val = DateTime::createFromFormat('!'.$platform->getDateFormatString(), $value);
+        $val = Date::createFromFormat($platform->getDateFormatString(), $value);
         if ( ! $val) {
             throw ConversionException::conversionFailedFormat($value, $this->getName(), $platform->getDateFormatString());
         }
