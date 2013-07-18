@@ -14,7 +14,7 @@ use Zend\ServiceManager\ServiceManager;
 trait EntityManagerAwareTrait
 {
     /**
-     * @var Doctrine\ORM\EntityManager
+     * @var \Doctrine\ORM\EntityManager
      */
     protected $entityManager;
 
