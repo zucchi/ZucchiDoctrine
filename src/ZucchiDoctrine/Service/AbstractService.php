@@ -97,7 +97,34 @@ class AbstractService implements EventManagerAwareInterface
         $class = $this->entityName;
         return new $class();
     }
-    
+
+    /**
+     * get count of entities
+     *
+     * @param array $where
+     * @param array $order
+     * @return int
+     */
+    public function getCount(
+        $where = array()
+    ){
+        if (!$this->entityName) {
+            throw new \RuntimeException('No Entity defined for ' . get_called_class() . ' service');
+        }
+
+        $hydrate = \Doctrine\ORM\Query::HYDRATE_ARRAY;
+
+        $em = $this->entityManager;
+        $qb = $em->createQueryBuilder();
+        $qb->select('count(' . $this->alias . ') as total')
+            ->from($this->entityName, $this->alias);
+
+        $this->addWhere($qb, $where);
+
+        $result = $qb->getQuery()->getSingleScalarResult();
+        return $result;
+    }
+
     /**
      * Get a list of entities.
      * 
@@ -113,8 +140,8 @@ class AbstractService implements EventManagerAwareInterface
     public function getList(
         $where = array(), 
         $order = array(),
-        $limit = self::INDEX_LIMIT,
         $offset = self::INDEX_OFFSET,
+        $limit = self::INDEX_LIMIT,
         $hydrate = \Doctrine\ORM\Query::HYDRATE_OBJECT,
         array $options = array()
     ){
