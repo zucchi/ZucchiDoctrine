@@ -78,7 +78,7 @@ class DoctrineEntity extends ReflectionHydrator
      * @param  object $object
      * @return array
      */
-    public function extract($object)
+    public function extract($object, $depth = 1)
     {
         $result = array();
         foreach (self::getReflProperties($object) as $property) {
@@ -89,7 +89,7 @@ class DoctrineEntity extends ReflectionHydrator
 
             $value = $property->getValue($object);
             if ($value instanceof AbstractEntity) {
-                $result[$propertyName] = $value->toArray(true);
+                $result[$propertyName] = $value->toArray($depth);
             } else {
                 $result[$propertyName] = $this->extractValue($propertyName, $value);
             }
