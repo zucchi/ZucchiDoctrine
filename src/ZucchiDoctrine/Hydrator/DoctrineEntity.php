@@ -107,7 +107,7 @@ class DoctrineEntity extends ReflectionHydrator
      * @throws \Exception
      * @return object
      */
-    public function hydrate(array $data, $object)
+    public function hydrate(array $data, $object, $depth = 2)
     {
         $metadata = $this->getEntityManager()->getClassMetadata(get_class($object));
 
@@ -159,10 +159,10 @@ class DoctrineEntity extends ReflectionHydrator
                         $data[$assoc] = $entity;
                         break;
                     case $metadata::ONE_TO_MANY: // 4
-                        $data[$assoc] = $this->toMany($value, $target, $object->{$assoc});
+                        $data[$assoc] = $this->toMany($value, $target, $object->{$assoc}, $depth);
                         break;
                     case $metadata::MANY_TO_MANY: // 8
-                        $data[$assoc] = $this->toMany($value, $target, $object->{$assoc});
+                        $data[$assoc] = $this->toMany($value, $target, $object->{$assoc}, $depth);
                         break;
                 }
             }
@@ -206,7 +206,7 @@ class DoctrineEntity extends ReflectionHydrator
      * @param string $target
      * @return array
      */
-    protected function toMany($valueOrObject, $target, Collection $collection = null)
+    protected function toMany($valueOrObject, $target, Collection $collection = null, $depth = 2)
     {
         if (!is_array($valueOrObject) && !$valueOrObject instanceof Traversable) {
             $valueOrObject = (array) $valueOrObject;
@@ -220,10 +220,11 @@ class DoctrineEntity extends ReflectionHydrator
 
         foreach($valueOrObject as $value) {
             if (method_exists($value, 'toArray')) {
-                $value = $value->toArray();
+                $value = $value->toArray($depth);
             } else if (!is_array($value) && !$value instanceof Traversable) {
                 $value = (array) $value;
             }
+
             if (isset($value['id']) &&
                 strlen($value['id']) &&
                 $found = $this->find($target, $value['id'])
