@@ -190,11 +190,22 @@ class DoctrineEntity extends ReflectionHydrator
             return $valueOrObject;
         }
 
-        $id = (is_array($valueOrObject)) ? $valueOrObject['id'] : $valueOrObject->id;
+        switch (true) {
+            case is_object($valueOrObject):
+                $id = (isset($valueOrObject->id)) ? $valueOrObject->id : 0;
+                break;
 
-        if ($id > 0){
+            case is_array($valueOrObject):
+                $id = (isset($valueOrObject['id']))? $valueOrObject['id'] : 0;
+                break;
+
+            default:
+                $id = 0;
+        }
+
+        if ($id > 0) {
             $entity = $this->find($target, $id);
-        }else{
+        } else {
             $entity = new $target();
         }
 
