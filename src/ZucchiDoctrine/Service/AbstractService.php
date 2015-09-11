@@ -13,12 +13,10 @@ use Zend\EventManager\EventManagerAwareInterface;
 use ZucchiDoctrine\Entity\AbstractEntity;
 use ZucchiDoctrine\EntityManager\EntityManagerAwareTrait;
 use Zucchi\Event\EventProviderTrait as EventProvider;
-use Zucchi\Debug\Debug;
 use Zucchi\ServiceManager\ServiceManagerAwareTrait;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\LockMode;
 
 /**

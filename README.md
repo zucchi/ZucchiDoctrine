@@ -17,7 +17,7 @@ Features
 *    Timestampable Trait
 *    Override of Date/Time Mappings to use Zucchi\DateTime Extended classes
 *    Abstract Entity Class
-*    Abstract Servcie Class
+*    Abstract Service Class
 *    Custom DQL Regex Function
 *    EntityField View helper for handling output of different entity field types
 *    One To Many Form Population via Annotations

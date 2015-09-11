@@ -19,23 +19,17 @@
 
 namespace ZucchiDoctrine\Hydrator;
 
-use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineObjectHydrator;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
-use Zend\Stdlib\Hydrator\AbstractHydrator;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use Zend\Stdlib\Hydrator\Reflection as ReflectionHydrator;
-use Zend\Stdlib\Hydrator\ObjectProperty as ObjectPropertyHydrator;
 use ZucchiDoctrine\EntityManager\EntityManagerAwareTrait;
-use Zucchi\ServiceManager\ServiceManagerAwareTrait;
 use ZucchiDoctrine\Entity\AbstractEntity;
 use Zucchi\DateTime\DateTime;
 use Zucchi\DateTime\Date;
 use Zucchi\DateTime\Time;
-
-
 
 /**
  * This hydrator is used as an optimization purpose for Doctrine ORM, and retrieves references to

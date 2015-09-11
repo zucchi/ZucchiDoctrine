@@ -16,11 +16,20 @@
     }],
     "license": "BSD-3-Clause",
     "require": {
-        "php": ">=5.4.1",
-        "zucchi/zucchi": "dev-master",
-        "doctrine/doctrine-orm-module": "dev-master",
+        "php": ">=5.5.29",
+        "zucchi/zucchi": "1.0",
+        "zendframework/zend-form": "2.*",
+        "zendframework/zend-eventmanager": "2.*",
+        "zendframework/zend-servicemanager": "2.*",
+        "zendframework/zend-mvc": "2.*",
+        "zendframework/zend-stdlib": "2.*",
+        "doctrine/doctrine-orm-module": "0.9.*",
+        "doctrine/doctrine-mongo-odm-module": "0.9.*",
         "doctrine/data-fixtures": "1.*",
         "gedmo/doctrine-extensions": "dev-master"
+    },
+    "require-dev": {
+        "codeception/codeception": "2.1.2"
     },
     "autoload": {
         "psr-0": {
