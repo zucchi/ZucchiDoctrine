@@ -43,7 +43,7 @@ class AbstractEntity implements
      * @ORM\Column(type="integer")
      * @Form\Exclude
      */
-    protected $version;
+    protected $current_version;
 
 
     /**
