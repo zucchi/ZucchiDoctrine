@@ -102,7 +102,7 @@ class AbstractEntity implements
         $this->current_version = $current_version;
         return $this;
     }
-    
+
 
     /**
      * return public and protected properties as an array
