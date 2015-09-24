@@ -67,6 +67,42 @@ class AbstractEntity implements
         $this->{$key} = $value;
     }
 
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     * @return AbstractEntity
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCurrentVersion()
+    {
+        return $this->current_version;
+    }
+
+    /**
+     * @param int $current_version
+     * @return AbstractEntity
+     */
+    public function setCurrentVersion($current_version)
+    {
+        $this->current_version = $current_version;
+        return $this;
+    }
+    
 
     /**
      * return public and protected properties as an array
