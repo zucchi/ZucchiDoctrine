@@ -58,13 +58,6 @@ class AbstractService implements EventManagerAwareInterface
     protected $entityName;
     
     /**
-     * The default alias key for queries, 'e' for entity.
-     *
-     * @var string
-     */
-    protected $alias = 'e';
-    
-    /**
      * The identifying field for the entity.
      *
      * @var string
