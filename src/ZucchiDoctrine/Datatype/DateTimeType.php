@@ -16,7 +16,7 @@ use Zucchi\DateTime\DateTime as DateTime;
  * Type that maps an SQL DATETIME/TIMESTAMP to an Extended PHP DateTime object.
  *
  * @author Matt Cockayne <matt@zucchi.co.uk>
- * @package ZucchiDoctrine 
+ * @package ZucchiDoctrine
  * @subpackage Datatype
  */
 class DateTimeType extends Type
@@ -33,9 +33,13 @@ class DateTimeType extends Type
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        return ($value instanceof \DateTime)
-            ? $value->format($platform->getDateTimeFormatString())
-            : date($platform->getDateTimeFormatString(), strtotime($value));
+        if (is_null($value)) {
+            return $value;
+        } else if ($value instanceof \DateTime) {
+            return $value->format($platform->getDateTimeFormatString());
+        } else {
+            return date($platform->getDateTimeFormatString(), strtotime($value));
+        }
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform)
@@ -45,7 +49,7 @@ class DateTimeType extends Type
         }
 
         $val = DateTime::createFromFormat($platform->getDateTimeFormatString(), $value);
-        if ( ! $val) {
+        if (!$val) {
             throw ConversionException::conversionFailedFormat($value, $this->getName(), $platform->getDateTimeFormatString());
         }
         return $val;
