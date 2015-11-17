@@ -12,6 +12,7 @@ use Zend\EventManager\EventManagerAwareInterface;
 
 use ZucchiDoctrine\Entity\AbstractEntity;
 use ZucchiDoctrine\EntityManager\EntityManagerAwareTrait;
+use ZucchiDoctrine\EntityManager\EntityManagerAwareInterface;
 use ZucchiDoctrine\Query\QueryBuilderTrait;
 use Zucchi\Event\EventProviderTrait as EventProvider;
 use Zucchi\ServiceManager\ServiceManagerAwareTrait;
@@ -29,7 +30,7 @@ use Doctrine\DBAL\LockMode;
  * @package ZucchiDoctrine
  * @subpackage Service
  */
-class AbstractService implements EventManagerAwareInterface
+class AbstractService implements EventManagerAwareInterface, EntityManagerAwareInterface
 {
     use EventProvider;
     use EntityManagerAwareTrait;
