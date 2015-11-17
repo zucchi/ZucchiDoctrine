@@ -89,60 +89,66 @@ trait QueryBuilderTrait
                         $par = $alias;
                     }
                 }
-                
-                // process sets a little differently
-                if (!is_array($val)) {
-                    $val = array($val);
-                }
-                
-                if ($operator == 'regexp') {
-                    $whereExp->add("REGEXP(" . $alias . '.' . $col . ",'" . $val[0] . "') = 1");
-                    
-                } else if ($operator == 'between') {
-                    if (count($val) == 2) {
-                        // $value should now be an array with 2 values
-                        $expr= new Expr();
-                        $from = (is_int($val[0])) ? $val[0] : "'" . $val[0] . "'";
-                        $to = (is_int($val[1])) ? $val[1] : "'" . $val[1] . "'";
-                        
-                        $stmt = $expr->between($alias . '.' . $col, $from, $to);
-                        $whereExp->add($stmt);
-                    }
 
-                } else if ($operator == 'is') {
-                    $expr= new Expr();
-                    $method = 'is' . ucfirst($val[0]);
-                    if (method_exists($expr, $method)) {
-                        $stmt = $expr->{$method}($alias . '.' . $col);
-                        $whereExp->add($stmt);
-                    }
-
+                if ($val instanceof Expr\Base) {
+                    $whereExp->add($val);
                 } else {
-                    // this holds the subquery for this field, each component being an OR
-                    $subWhereExp = $qb->expr()->orX();
-                    
-                    foreach ($val as $value) {
-                        if ($value == null) {
-                            $cmpValue = 'NULL';
-                        } else {
-                            $cmpValue = '?' . $i;
-                            
-                            // wrap LIKE values
-                            if ($operator == 'like') {
-                                $value = '%' . trim($value, '%') . '%';
-                            }
-    
-                            // add the parameter value into the parameters stack
-                            $params[$i] = $value;
-                            $i++;
-                        }
-                            
-                        $comparison = new Expr\Comparison($alias . '.' . $col, $operator, $cmpValue);
-                        $subWhereExp->add($comparison);
+                    // process sets a little differently
+                    if (!is_array($val)) {
+                        $val = array($val);
                     }
-                    
-                    // add in the subquery as an AND
-                    $whereExp->add($subWhereExp);
+                    switch ($operator) {
+                        case 'regexp':
+                            $whereExp->add("REGEXP(" . $alias . '.' . $col . ",'" . $val[0] . "') = 1");
+                            break;
+                        case 'between':
+                            if (count($val) == 2) {
+                                // $value should now be an array with 2 values
+                                $expr = new Expr();
+                                $from = (is_int($val[0])) ? $val[0] : "'" . $val[0] . "'";
+                                $to = (is_int($val[1])) ? $val[1] : "'" . $val[1] . "'";
+
+                                $stmt = $expr->between($alias . '.' . $col, $from, $to);
+                                $whereExp->add($stmt);
+                            }
+                            break;
+                        case 'is':
+                            $expr = new Expr();
+                            $method = 'is' . ucfirst($val[0]);
+                            if (method_exists($expr, $method)) {
+                                $stmt = $expr->{$method}($alias . '.' . $col);
+                                $whereExp->add($stmt);
+                            }
+                            break;
+                        default:
+                            // this holds the subquery for this field, each component being an OR
+                            $subWhereExp = $qb->expr()->orX();
+
+                            foreach ($val as $value) {
+                                if ($value == null) {
+                                    $cmpValue = 'NULL';
+                                } else {
+                                    $cmpValue = '?' . $i;
+
+                                    // wrap LIKE values
+                                    if ($operator == 'like') {
+                                        $value = '%' . trim($value, '%') . '%';
+                                    }
+
+                                    // add the parameter value into the parameters stack
+                                    $params[$i] = $value;
+                                    $i++;
+                                }
+
+                                $comparison = new Expr\Comparison($alias . '.' . $col, $operator, $cmpValue);
+                                $subWhereExp->add($comparison);
+                            }
+
+                            // add in the subquery as an AND
+                            $whereExp->add($subWhereExp);
+                            break;
+
+                    }
                 }
             }
             
