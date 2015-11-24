@@ -17,7 +17,7 @@
     "license": "BSD-3-Clause",
     "require": {
         "php": ">=5.5.29",
-        "zucchi/zucchi": "0.14",
+        "zucchi/zucchi": ">=0.15",
         "zendframework/zend-form": "2.*",
         "zendframework/zend-eventmanager": "2.*",
         "zendframework/zend-servicemanager": "2.*",
