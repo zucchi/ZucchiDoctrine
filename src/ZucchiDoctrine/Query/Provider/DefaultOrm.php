@@ -43,7 +43,7 @@ class DefaultOrm extends ApiDoctrineDefaultOrm implements EventManagerAwareInter
         }
 
         // trigger event for manipulating $where
-        $providerEvent = new Event(Event::EVENT_WHERE, $where);
+        $providerEvent = new Event(Event::EVENT_WHERE, $where, array('entityClass' => $entityClass));
         $providerEvent->setEntityManager($this->getObjectManager());
         $this->getEventManager()->trigger($providerEvent);
         $where = $providerEvent->getTarget();
@@ -55,7 +55,7 @@ class DefaultOrm extends ApiDoctrineDefaultOrm implements EventManagerAwareInter
 
         // trigger event for manipulating $order
         $order = $event->getQueryParam('order', false);
-        $providerEvent = new Event(Event::EVENT_ORDER, $order);
+        $providerEvent = new Event(Event::EVENT_ORDER, $order, array('entityClass' => $entityClass));
         $providerEvent->setEntityManager($this->getObjectManager());
         $this->getEventManager()->trigger($providerEvent);
         $order = $providerEvent->getTarget();
@@ -66,7 +66,7 @@ class DefaultOrm extends ApiDoctrineDefaultOrm implements EventManagerAwareInter
 
         // trigger event for manipulating $limit
         $limit = $event->getQueryParam('limit', false);
-        $providerEvent = new Event(Event::EVENT_LIMIT, $limit);
+        $providerEvent = new Event(Event::EVENT_LIMIT, $limit, array('entityClass' => $entityClass));
         $providerEvent->setEntityManager($this->getObjectManager());
         $this->getEventManager()->trigger($providerEvent);
         $limit = $providerEvent->getTarget();
