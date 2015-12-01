@@ -23,8 +23,8 @@
         "zendframework/zend-servicemanager": "2.*",
         "zendframework/zend-mvc": "2.*",
         "zendframework/zend-stdlib": "2.*",
-        "doctrine/doctrine-orm-module": "0.9.*",
-        "doctrine/doctrine-mongo-odm-module": "0.9.*",
+        "doctrine/doctrine-orm-module": ">=0.9",
+        "doctrine/doctrine-mongo-odm-module": ">=0.9",
         "doctrine/data-fixtures": "1.*",
         "gedmo/doctrine-extensions": "2.4.6"
     },
