@@ -45,6 +45,11 @@ return array(
             'zucchidoctrine.entityhydrator' => 'ZucchiDoctrine\Hydrator\DoctrineEntity'
         ),
     ),
+    'zf-apigility-doctrine-query-provider' => array(
+        'invokables' => array(
+            'zucchi.query.provider.fetch_all' => 'ZucchiDoctrine\Query\Provider\DefaultOrm',
+        )
+    ),
     'view_helpers' => array(
         'invokables' => array(
             // generic view helpers
