@@ -8,6 +8,7 @@ use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use ZF\Apigility\Doctrine\Server\Query\Provider\DefaultOrm as ApiDoctrineDefaultOrm;
 use ZF\Rest\ResourceEvent;
 use Zucchi\Controller\RequestParserTrait;
+use Zucchi\Event\EventProviderTrait;
 use ZucchiDoctrine\Query\QueryBuilderTrait;
 
 /**
@@ -19,7 +20,7 @@ class DefaultOrm extends ApiDoctrineDefaultOrm implements EventManagerAwareInter
     use ServiceLocatorAwareTrait;
     use RequestParserTrait;
     use QueryBuilderTrait;
-    use EventManagerAwareTrait;
+    use EventProviderTrait;
 
     /**
      * @param string $entityClass
