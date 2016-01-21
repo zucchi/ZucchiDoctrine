@@ -22,6 +22,8 @@ class DefaultOrm extends ApiDoctrineDefaultOrm implements EventManagerAwareInter
     use QueryBuilderTrait;
     use EventProviderTrait;
 
+    protected $entityAlias = 'row';
+
     /**
      * @param string $entityClass
      * @param array  $parameters
@@ -31,8 +33,8 @@ class DefaultOrm extends ApiDoctrineDefaultOrm implements EventManagerAwareInter
     public function createQuery(ResourceEvent $event, $entityClass, $parameters)
     {
         $queryBuilder = $this->getObjectManager()->createQueryBuilder();
-        $queryBuilder->select('e')
-            ->from($entityClass, 'e');
+        $queryBuilder->select($this->entityAlias)
+            ->from($entityClass, $this->entityAlias);
 
 		$routeParams = $event->getRouteMatch()->getParams();
 
