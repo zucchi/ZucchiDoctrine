@@ -24,7 +24,7 @@ trait QueryBuilderTrait
      *
      * @var string
      */
-    protected $alias = 'e';
+    protected $alias = 'row';
 
     /**
      * Build where statement and add to the query builder.
