@@ -20,5 +20,5 @@ class Event extends ZendEvent implements EntityManagerAwareInterface
     const EVENT_WHERE = 'where';
     const EVENT_ORDER = 'order';
     const EVENT_LIMIT = 'limit';
-
+    const EVENT_QUERYBUILDER = 'querybuilder';
 }

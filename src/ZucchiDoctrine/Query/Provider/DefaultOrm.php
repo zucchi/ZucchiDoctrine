@@ -78,6 +78,11 @@ class DefaultOrm extends ApiDoctrineDefaultOrm implements EventManagerAwareInter
             $this->addLimit($queryBuilder, $limit);
         }
 
+        // trigger event for manipulating $where
+        $providerEvent = new Event(Event::EVENT_QUERYBUILDER, $queryBuilder, array('entityClass' => $entityClass));
+        $providerEvent->setEntityManager($this->getObjectManager());
+        $this->getEventManager()->trigger($providerEvent);
+
         return $queryBuilder;
     }
 
